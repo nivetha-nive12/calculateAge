@@ -1,0 +1,61 @@
+src/components/code.jsx
+
+import { useState } from 'preact/hooks'
+
+const initialItems = ['Apple', 'Banana', 'Cherry']
+
+export function AgeCalculator() {
+  const [birthYear, setBirthYear] = useState('')
+  const [age, setAge] = useState(null)
+  const [items, setItems] = useState(initialItems)
+  const [draggedIdx, setDraggedIdx] = useState(null)
+
+  const handleCalculate = () => {
+    const year = parseInt(birthYear, 10)
+    if (!isNaN(year)) {
+      setAge(new Date().getFullYear() - year)
+    } else {
+      setAge(null)
+    }
+  }
+
+  const handleDragStart = (idx) => setDraggedIdx(idx)
+  const handleDrop = (idx) => {
+    if (draggedIdx === null || draggedIdx === idx) return
+    const updated = [...items]
+    const [removed] = updated.splice(draggedIdx, 1)
+    updated.splice(idx, 0, removed)
+    setItems(updated)
+    setDraggedIdx(null)
+  }
+
+  return (
+    <div>
+      <h2>Calculate Age from Birth Year</h2>
+      <input
+        type="number"
+        placeholder="Enter birth year"
+        value={birthYear}
+        onInput={e => setBirthYear(e.target.value)}
+      />
+      <button onClick={handleCalculate}>Calculate Age</button>
+      {age !== null && <p>Your age is: {age}</p>}
+
+      <h3>Reorderable Items</h3>
+      <ul>
+        {items.map((item, idx) => (
+          <li
+            key={item}
+            draggable
+            onDragStart={() => handleDragStart(idx)}
+            onDragOver={e => e.preventDefault()}
+            onDrop={() => handleDrop(idx)}
+            style={{ cursor: 'move', padding: '4px', border: '1px solid #ccc', marginBottom: '4px', background: '#f9f9f9' }}
+          >
+            {item}
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
